@@ -12,7 +12,7 @@
           <input type="search" v-model="searchQuery"/>
         </div>
         <ul>
-          <li v-for="eml in filteredEmails" :class="eml.highlighted">{{ eml.email }}</li>
+          <li v-for="eml in filteredEmails" :class="{ marked: eml.highlighted }">{{ eml.email }}</li>
         </ul>
       </div>
     </div>

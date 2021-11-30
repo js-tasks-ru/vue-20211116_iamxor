@@ -37,7 +37,7 @@ const RootComponent = defineComponent({
           searchQuery: '',
           originEmails: emails.map((item) => ({
             email: item,
-            highlighted: '',
+            highlighted: false,
           })),
         }
     },
@@ -47,7 +47,7 @@ const RootComponent = defineComponent({
       filteredEmails() {
         return this.originEmails.map((item) => ({
           email: item.email,
-          highlighted: this.searchQuery && item.email.toLowerCase().includes(this.searchQuery.toLowerCase()) ? 'marked' : ''
+          highlighted: this.searchQuery && item.email.toLowerCase().includes(this.searchQuery.toLowerCase())
         }));
       }
 
