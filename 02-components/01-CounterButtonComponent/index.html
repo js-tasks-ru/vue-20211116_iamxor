@@ -2,16 +2,16 @@
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
-    <link rel="stylesheet" href="/assets/styles/index.css" />
-    <link rel="stylesheet" href="/assets/styles/taskbook.css" />
     <title>CounterButtonComponent</title>
   </head>
   <body>
     <div id="app" class="sample container">
       <p>count = {{ count }}</p>
-      <p><counter-button :count="count" @update:count="count = $event"></counter-button></p>
+          
       <p><counter-button v-model:count="count"></counter-button></p>
       <p><counter-button v-model:count="count"></counter-button></p>
+      <p><counter-button v-model:count="count"></counter-button></p>
+
     </div>
 
     <script type="module">
@@ -28,6 +28,7 @@
             count: undefined,
           };
         },
+
       }).mount('#app');
     </script>
   </body>
