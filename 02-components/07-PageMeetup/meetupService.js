@@ -46,3 +46,9 @@ export const agendaItemIcons = {
   afterparty: 'cal-sm',
   other: 'cal-sm',
 };
+
+export const fetchStateEnum = {
+  error: -1,
+  success: 0,
+  busy: 1,
+};
