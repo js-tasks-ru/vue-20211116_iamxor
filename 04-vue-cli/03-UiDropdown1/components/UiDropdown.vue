@@ -1,7 +1,7 @@
 <template>
     <div class="dropdown" :class="{ dropdown_opened: dropdownOpened }">
         <button class="dropdown__toggle" :class="{ dropdown__toggle_icon: iconExists }" @click="toggleDropdown">
-            <ui-icon :icon="itemIcon" class="dropdown__icon" />
+            <ui-icon v-if="itemIcon" :icon="itemIcon" class="dropdown__icon" />
             {{ itemTitle }}
         </button>
 
