@@ -1,8 +1,20 @@
 <template>
   <div class="image-uploader">
-    <label class="image-uploader__preview image-uploader__preview-loading" style="--bg-url: url('/link.jpeg')">
-      <span class="image-uploader__text">Загрузить изображение</span>
-      <input type="file" accept="image/*" class="image-uploader__input" />
+    <label
+      class="image-uploader__preview"
+      :class="{ 'image-uploader__preview-loading': state === 'uploading' }"
+      :style="{ '--bg-url': backgroundUrl }"
+      @click="uploadImageClick">
+
+      <span class="image-uploader__text">{{ uploaderText }}</span>
+
+      <input
+        ref="input"
+        v-bind="$attrs"
+        type="file"
+        accept="image/*"
+        class="image-uploader__input"
+        @change="changeImage" />
     </label>
   </div>
 </template>
@@ -10,6 +22,117 @@
 <script>
 export default {
   name: 'UiImageUploader',
+
+  inheritAttrs: false,
+
+  props: {
+
+    preview: {
+      type: String,
+    },
+
+    uploader: {
+      type: Function,
+    },
+
+  },
+  
+  emits: ['select', 'remove', 'upload', 'error'],
+
+  data() {
+    return {
+      uploadedImage: this.preview,
+      needCleanup: false,
+      state: this.preview ? 'preview' : 'empty',
+    };
+  },
+
+  computed: {
+    backgroundUrl() {
+      if (this.state !== 'preview') return 'var(--default-cover)';
+      return this.uploadedImage && `url('${this.uploadedImage}')`;
+    },
+
+    uploaderText() {
+      switch(this.state){
+        case 'empty':
+          return 'Загрузить изображение';
+        case 'uploading':
+          return 'Загрузка...';
+        case 'preview':
+          return 'Удалить изображение';
+      }
+    }
+  },
+
+   unmounted() {
+     this.revoke();
+  },
+
+  methods: {
+
+    uploadImageClick($event) {
+      
+      switch(this.state){
+        case 'preview':
+          $event.preventDefault();
+          this.remove();
+          this.$emit('remove');          
+          break;
+        case 'uploading':
+          $event.preventDefault();
+          break;
+      }
+
+    },
+
+    changeImage($event) {
+      this.revoke();
+      const file = $event.target.files[0];
+      this.$emit('select', file);
+      if (this.uploader) {
+        this.upload(file);
+      } else {
+        this.createPreview(file);
+      }
+    },
+
+    upload(file) {
+      this.state = 'uploading';
+      this.uploader(file).then(this.uploadSuccess, this.uploadError);
+    },
+
+    uploadSuccess(result) {
+      this.uploadedImage = result.image;
+      this.state = 'preview';
+      this.$emit('upload', result);
+    },
+
+    uploadError(error) {
+      this.remove();
+      this.$emit('error', error);
+    },
+
+    createPreview(file) {
+      this.uploadedImage = URL.createObjectURL(file);
+      this.needCleanup = true;
+      this.state = 'preview';
+    },
+
+    remove() {
+      this.state = 'empty';
+      this.uploadedImage = null;
+      this.$refs.input.value = null;
+    },
+
+    revoke() {
+      if (this.needCleanup) {
+        URL.revokeObjectURL(this.uploadedImage);
+        this.needCleanup = false;
+      }      
+    },
+
+  },
 };
 </script>
 

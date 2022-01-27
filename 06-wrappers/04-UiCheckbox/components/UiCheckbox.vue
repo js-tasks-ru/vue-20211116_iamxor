@@ -1,14 +1,41 @@
 <template>
   <label class="checkbox">
-    <input type="checkbox" class="checkbox__input" />
+    <input v-model="checkboxModel" v-bind="$attrs" type="checkbox" class="checkbox__input" />
     <span class="checkbox__box"></span>
-    Label Text
+    <slot />
   </label>
 </template>
 
 <script>
 export default {
   name: 'UiCheckbox',
+  
+  inheritAttrs: false,
+
+  props: {
+    modelValue: {
+      type: [Array, Boolean],
+      default: false,
+    },
+  },
+  
+  emits: ['update:modelValue'],
+
+  computed: {
+
+    checkboxModel: {
+      
+      get() {
+        return this.modelValue;
+      },
+
+      set(value) {
+        this.$emit('update:modelValue', value);
+      },
+
+    },
+
+  },
 };
 </script>
 
