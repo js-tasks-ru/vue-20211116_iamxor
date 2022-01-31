@@ -1,22 +1,127 @@
 <template>
-  <div class="input-group input-group_icon input-group_icon-left input-group_icon-right">
-    <div class="input-group__icon">
-      <img class="icon" alt="icon" />
+  <div
+    class="input-group" :class="inputClassList">
+
+    <div v-if="iconLeft" class="input-group__icon">
+      <slot name="left-icon" />
     </div>
 
-    <input ref="input" class="form-control form-control_rounded form-control_sm" />
+    <component
+      :is="tag"
+      v-bind="$attrs"
+      ref="input"
+      :value="modelValue"
+      class="form-control"
+      :class="{ 'form-control_sm': small, 'form-control_rounded': rounded }"
+      @[eventName]="updateEvent" />
 
-    <div class="input-group__icon">
-      <img class="icon" alt="icon" />
+    <div v-if="iconRight" class="input-group__icon">
+      <slot name="right-icon" />
     </div>
+
   </div>
 </template>
 
 <script>
+
+const classDefinitions = {
+  any: 'input-group_icon',
+  left: 'input-group_icon-left',
+  right: 'input-group_icon-right',
+};
+
 export default {
   name: 'UiInput',
+  
+  inheritAttrs: false,
+
+  props: {
+    
+    small: {
+      type: Boolean,
+      default: false,
+    },
+
+    rounded: {
+      type: Boolean,
+      default: false,
+    },
+
+    multiline: {
+      type: Boolean,
+      default: false,
+    },
+
+    modelValue: {
+      type: String,
+    },
+
+    modelModifiers: {
+      default: () => ({}),
+    },
+
+  },
+
+  emits: ['update:modelValue'],
+
+  computed: {
+    
+    inputClassList() {
+      const res = [];
+      
+      if(this.anyIcon) {
+        res.push(classDefinitions['any']);
+      }
+      
+      if(this.iconLeft) {
+        res.push(classDefinitions['left']);
+      }
+      if(this.iconRight) {
+        res.push(classDefinitions['right']);
+      }
+
+      return res;
+    },
+    
+    tag() {
+      return this.multiline ? 'textarea' : 'input';
+    },
+
+    anyIcon() {
+      return this.iconLeft || this.iconRight;
+    },
+
+    iconLeft() {
+      return !!this.$slots['left-icon'];
+    },
+
+    iconRight() {
+      return !!this.$slots['right-icon'];
+    },
+
+    eventName() {
+      return this.modelModifiers.lazy ? 'change' : 'input';
+    },
+
+  },
+
+  expose: ['focus'],
+
+  methods: {
+    
+    focus() {
+      this.$refs.input.focus();
+    },
+    
+    updateEvent($event) {
+      this.$emit('update:modelValue', $event.target.value);
+    },
+
+  },
+
 };
 </script>
+
 
 <style scoped>
 .form-control {
